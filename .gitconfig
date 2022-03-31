@@ -1,0 +1,15 @@
+# This is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+	name = Alon Yehezkel
+	email = alony@bookaway.com
+[core]
+	excludesfile = /Users/alony/.gitignore_global
+[merge]
+	tool = kdiff3
+[mergetool "kdiff3"]
+  path = /Applications/kdiff3.app/Contents/MacOS/kdiff3
+  args = $base $local $other -o $output
+  trustExitCode = false
+[pull]
+	rebase = true

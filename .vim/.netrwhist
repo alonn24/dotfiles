@@ -1,0 +1,5 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/Users/alony/Projects/alonn24/lp-template/.git'
+let g:netrw_dirhist_2='/Users/alony/Projects/bookaway-platform/landing-page/.git'
+let g:netrw_dirhist_1='/Users/alony/Projects/bookaway-ops/cluster/bookaway'

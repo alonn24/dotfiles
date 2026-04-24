@@ -103,6 +103,11 @@ run_section() {
 }
 
 main() {
+  if [[ "$(uname -m)" != "arm64" ]]; then
+    echo "Error: this installer targets Apple Silicon (arm64). Detected: $(uname -m)." >&2
+    exit 1
+  fi
+
   # Non-interactive: --force / -f runs everything
   if [[ "$1" == "--force" || "$1" == "-f" ]]; then
     install_brew; install_cli_tools; install_zsh_plugins; install_dotfiles

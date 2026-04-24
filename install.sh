@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+warn() { echo -e "\033[0;33m[WARN]\033[0m $1"; }
+
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ── colour helpers ────────────────────────────────────────────────────────────
@@ -81,7 +83,7 @@ show_menu() {
   echo "║         dotfiles installer — choose a section         ║"
   echo "╠═══════════════════════════════════════════════════════╣"
   echo "║  1) Homebrew                                          ║"
-  echo "║  2) CLI tools  (autojump · fzf · lazygit · gh)       ║"
+  echo "║  2) CLI tools  (autojump · fzf · lazygit · gh · hub) ║"
   echo "║  3) ZSH plugins (autosuggestions · syntax · p10k)    ║"
   echo "║  4) Dotfiles   (rsync to ~/)                         ║"
   echo "║  a) All of the above                                  ║"
@@ -96,6 +98,7 @@ run_section() {
     2) install_cli_tools ;;
     3) install_zsh_plugins ;;
     4) install_dotfiles ;;
+    *) warn "Unknown section: $1" ;;
   esac
 }
 
@@ -110,9 +113,12 @@ main() {
     show_menu
     read -rp "Enter choice: " choice
     case "$choice" in
-      1|2|3|4) run_section "$choice" ;;
+      1|2|3|4) run_section "$choice" || warn "Section $choice failed — continuing" ;;
       a|A)
-        install_brew; install_cli_tools; install_zsh_plugins; install_dotfiles
+        install_brew || warn "Homebrew failed"
+        install_cli_tools || warn "CLI tools failed"
+        install_zsh_plugins || warn "ZSH plugins failed"
+        install_dotfiles || warn "Dotfiles failed"
         break ;;
       q|Q) echo "Bye."; break ;;
       *) echo "Unknown option — try 1–4, a, or q." ;;

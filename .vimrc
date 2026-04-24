@@ -16,4 +16,5 @@ autocmd BufNewFile,BufRead .eslintrc set filetype=javascript
 autocmd BufNewFile,BufRead *.es6 set filetype=javascript
 autocmd BufRead,BufNewFile *.py setlocal foldmethod=indent
 
+" Apple Silicon only — /usr/local/opt/fzf on Intel
 set rtp+=/opt/homebrew/opt/fzf

@@ -1,3 +1,12 @@
+# Pure env exports — no I/O, safe above the instant prompt preamble
+export NVM_DIR="$HOME/.nvm"
+export NODE_ENV=development
+export PATH="$HOME/.local/bin:$PATH"
+export FZF_DEFAULT_COMMAND='
+  (git ls-tree -r --name-only HEAD ||
+   find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+      sed s/^..//) 2> /dev/null'
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -78,6 +87,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting autojump)
 
+zstyle ':omz:update' mode auto
 source $ZSH/oh-my-zsh.sh
 # User configuration
 
@@ -105,15 +115,9 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
-export NODE_ENV=development
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh" >/dev/null 2>&1
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_COMMAND='
-  (git ls-tree -r --name-only HEAD ||
-   find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
-      sed s/^..//) 2> /dev/null'
 
 # Aliases
 alias dco="docker-compose"
@@ -122,7 +126,7 @@ alias npmToken="cat ~/.npmrc | egrep -o '[a-zA-Z0-9\-]*$'"
 alias sqh="g rebase -i HEAD~2"
 alias pr="hub pull-request -a alonn24 --no-edit -m"
 alias whoUsePort="lsof -i -P -n | grep"
-export NPM_TOKEN=`npmToken`
+export NPM_TOKEN=$(cat ~/.npmrc 2>/dev/null | grep -o '[a-zA-Z0-9\-]*$')
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

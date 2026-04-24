@@ -21,8 +21,8 @@ install_brew() {
 
 # ── Section 2: CLI tools ──────────────────────────────────────────────────────
 install_cli_tools() {
-  info "Section 2 — CLI tools: autojump, fzf, lazygit, gh"
-  brew install autojump fzf lazygit gh
+  info "Section 2 — CLI tools: autojump, fzf, lazygit, gh, hub"
+  brew install autojump fzf lazygit gh hub
   if [[ ! -f "$HOME/.fzf.zsh" ]]; then
     "$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish
   fi

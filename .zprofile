@@ -1,2 +1,3 @@
 
-export PATH="$HOME/.cargo/bin:$PATH"
+# Apple Silicon only — /usr/local/bin/brew on Intel
+eval "$(/opt/homebrew/bin/brew shellenv zsh)"

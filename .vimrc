@@ -16,12 +16,5 @@ autocmd BufNewFile,BufRead .eslintrc set filetype=javascript
 autocmd BufNewFile,BufRead *.es6 set filetype=javascript
 autocmd BufRead,BufNewFile *.py setlocal foldmethod=indent
 
-call plug#begin('~/.vim/plugged')
-
-Plug '/usr/local/opt/fzf'
-Plug 'junegunn/fzf.vim'
-
-Plug 'airblade/vim-gitgutter'
-Plug 'tpope/vim-fugitive'
-
-call plug#end()
+" Apple Silicon only — /usr/local/opt/fzf on Intel
+set rtp+=/opt/homebrew/opt/fzf

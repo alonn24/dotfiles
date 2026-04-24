@@ -85,7 +85,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting autojump)
+plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting)
 
 zstyle ':omz:update' mode auto
 source $ZSH/oh-my-zsh.sh
@@ -130,4 +130,3 @@ export NPM_TOKEN=$(cat ~/.npmrc 2>/dev/null | grep -o '[a-zA-Z0-9\-]*$')
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-export PATH="$HOME/.local/bin:$PATH"

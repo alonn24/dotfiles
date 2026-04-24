@@ -18,6 +18,8 @@ install_brew() {
     return
   fi
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  # Make brew available in this shell session immediately after install
+  eval "$(/opt/homebrew/bin/brew shellenv)"
   success "Homebrew installed"
 }
 
@@ -34,23 +36,31 @@ install_cli_tools() {
 # ── Section 3: ZSH plugins ────────────────────────────────────────────────────
 install_zsh_plugins() {
   local custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-  info "Section 3 — ZSH plugins: zsh-autosuggestions, zsh-syntax-highlighting, powerlevel10k"
+  info "Section 3 — oh-my-zsh + ZSH plugins: zsh-autosuggestions, zsh-syntax-highlighting, powerlevel10k"
 
-  if [[ ! -d "$custom/plugins/zsh-autosuggestions" ]]; then
+  if [[ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]]; then
+    RUNZSH=no KEEP_ZSHRC=yes sh -c \
+      "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
+      "" --unattended
+  else
+    success "oh-my-zsh already installed — skipping"
+  fi
+
+  if [[ ! -d "$custom/plugins/zsh-autosuggestions/.git" ]]; then
     git clone https://github.com/zsh-users/zsh-autosuggestions \
       "$custom/plugins/zsh-autosuggestions"
   else
     success "zsh-autosuggestions already present — skipping"
   fi
 
-  if [[ ! -d "$custom/plugins/zsh-syntax-highlighting" ]]; then
+  if [[ ! -d "$custom/plugins/zsh-syntax-highlighting/.git" ]]; then
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
       "$custom/plugins/zsh-syntax-highlighting"
   else
     success "zsh-syntax-highlighting already present — skipping"
   fi
 
-  if [[ ! -d "$custom/themes/powerlevel10k" ]]; then
+  if [[ ! -d "$custom/themes/powerlevel10k/.git" ]]; then
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
       "$custom/themes/powerlevel10k"
   else
@@ -65,7 +75,6 @@ install_dotfiles() {
   info "Section 4 — Syncing dotfiles to $HOME"
   rsync --exclude ".git/" \
         --exclude ".DS_Store" \
-        --exclude "bootstrap.sh" \
         --exclude "install.sh" \
         --exclude "docs/" \
         --exclude "scripts/" \
@@ -83,9 +92,9 @@ show_menu() {
   echo "║         dotfiles installer — choose a section         ║"
   echo "╠═══════════════════════════════════════════════════════╣"
   echo "║  1) Homebrew                                          ║"
-  echo "║  2) CLI tools  (autojump · fzf · lazygit · gh · hub) ║"
-  echo "║  3) ZSH plugins (autosuggestions · syntax · p10k)    ║"
-  echo "║  4) Dotfiles   (rsync to ~/)                         ║"
+  echo "║  2) CLI tools  (autojump · fzf · lazygit · gh · hub)  ║"
+  echo "║  3) ZSH plugins (autosuggestions · syntax · p10k)     ║"
+  echo "║  4) Dotfiles   (rsync to ~/)                          ║"
   echo "║  a) All of the above                                  ║"
   echo "║  q) Quit                                              ║"
   echo "╚═══════════════════════════════════════════════════════╝"
@@ -118,12 +127,12 @@ main() {
     show_menu
     read -rp "Enter choice: " choice
     case "$choice" in
-      1|2|3|4) run_section "$choice" || warn "Section $choice failed — continuing" ;;
+      1|2|3|4) (set -e; run_section "$choice") || warn "Section $choice failed — continuing" ;;
       a|A)
-        install_brew || warn "Homebrew failed"
-        install_cli_tools || warn "CLI tools failed"
-        install_zsh_plugins || warn "ZSH plugins failed"
-        install_dotfiles || warn "Dotfiles failed"
+        (set -e; install_brew)        || warn "Homebrew failed"
+        (set -e; install_cli_tools)   || warn "CLI tools failed"
+        (set -e; install_zsh_plugins) || warn "ZSH plugins failed"
+        (set -e; install_dotfiles)    || warn "Dotfiles failed"
         break ;;
       q|Q) echo "Bye."; break ;;
       *) echo "Unknown option — try 1–4, a, or q." ;;

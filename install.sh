@@ -4,7 +4,7 @@ set -e
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ── colour helpers ────────────────────────────────────────────────────────────
-RED='\033[0;31m'; GREEN='\033[0;32m'; BLUE='\033[0;34m'; NC='\033[0m'
+GREEN='\033[0;32m'; BLUE='\033[0;34m'; NC='\033[0m'
 info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
 success() { echo -e "${GREEN}[ OK ]${NC} $1"; }
 
@@ -23,8 +23,9 @@ install_brew() {
 install_cli_tools() {
   info "Section 2 — CLI tools: autojump, fzf, lazygit, gh"
   brew install autojump fzf lazygit gh
-  # Set up fzf shell integration (key bindings + completion for zsh only)
-  "$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish
+  if [[ ! -f "$HOME/.fzf.zsh" ]]; then
+    "$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish
+  fi
   success "CLI tools installed"
 }
 

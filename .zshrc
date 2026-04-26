@@ -117,6 +117,12 @@ source $ZSH/oh-my-zsh.sh
 
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh" >/dev/null 2>&1
 
+autoload -U add-zsh-hook
+_nvm_auto_use() {
+  [[ -f .nvmrc ]] && nvm use
+}
+add-zsh-hook chpwd _nvm_auto_use
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Aliases

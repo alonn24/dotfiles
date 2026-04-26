@@ -25,8 +25,8 @@ install_brew() {
 
 # ── Section 2: CLI tools ──────────────────────────────────────────────────────
 install_cli_tools() {
-  info "Section 2 — CLI tools: autojump, fzf, lazygit, gh, hub"
-  brew install autojump fzf lazygit gh hub
+  info "Section 2 — CLI tools: autojump, fzf, lazygit, gh, hub, nvm"
+  brew install autojump fzf lazygit gh hub nvm
   if [[ ! -f "$HOME/.fzf.zsh" ]]; then
     "$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish
   fi
@@ -92,7 +92,7 @@ show_menu() {
   echo "║         dotfiles installer — choose a section         ║"
   echo "╠═══════════════════════════════════════════════════════╣"
   echo "║  1) Homebrew                                          ║"
-  echo "║  2) CLI tools  (autojump · fzf · lazygit · gh · hub)  ║"
+  echo "║  2) CLI tools  (autojump · fzf · lazygit · gh · hub · nvm) ║"
   echo "║  3) ZSH plugins (autosuggestions · syntax · p10k)     ║"
   echo "║  4) Dotfiles   (rsync to ~/)                          ║"
   echo "║  a) All of the above                                  ║"

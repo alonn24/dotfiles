@@ -18,25 +18,37 @@ install_brew() {
     return
   fi
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # Make brew available in this shell session immediately after install
   eval "$(/opt/homebrew/bin/brew shellenv)"
   success "Homebrew installed"
 }
 
 # ── Section 2: CLI tools ──────────────────────────────────────────────────────
-install_cli_tools() {
-  info "Section 2 — CLI tools: autojump, fzf, lazygit, gh, hub, nvm"
-  brew install autojump fzf lazygit gh hub nvm
+install_brews() {
+  info "Section 2 — CLI brews: autojump, fzf, lazygit, gh, hub, nvm, vim, kubectl"
+  brew install autojump fzf lazygit gh hub nvm vim kubectl
   if [[ ! -f "$HOME/.fzf.zsh" ]]; then
     "$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish
   fi
-  success "CLI tools installed"
+  success "CLI brews installed"
 }
 
-# ── Section 3: ZSH plugins ────────────────────────────────────────────────────
+# ── Section 3: GUI apps (casks) ───────────────────────────────────────────────
+install_casks() {
+  info "Section 3 — GUI apps (casks): iterm2, kdiff3, docker"
+  for cask in iterm2 kdiff3 docker; do
+    if brew list --cask "$cask" &>/dev/null; then
+      brew upgrade --cask "$cask" || warn "$cask upgrade failed (may need GUI sudo) — skipping"
+    else
+      brew install --cask "$cask" || warn "$cask install failed (may need GUI sudo) — skipping"
+    fi
+  done
+  success "Casks done"
+}
+
+# ── Section 4: ZSH plugins ────────────────────────────────────────────────────
 install_zsh_plugins() {
   local custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-  info "Section 3 — oh-my-zsh + ZSH plugins: zsh-autosuggestions, zsh-syntax-highlighting, powerlevel10k"
+  info "Section 4 — oh-my-zsh + ZSH plugins: zsh-autosuggestions, zsh-syntax-highlighting, powerlevel10k"
 
   if [[ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]]; then
     RUNZSH=no KEEP_ZSHRC=yes sh -c \
@@ -70,9 +82,9 @@ install_zsh_plugins() {
   success "ZSH plugins and theme installed"
 }
 
-# ── Section 4: Dotfiles ───────────────────────────────────────────────────────
+# ── Section 5: Dotfiles ───────────────────────────────────────────────────────
 install_dotfiles() {
-  info "Section 4 — Syncing dotfiles to $HOME"
+  info "Section 5 — Syncing dotfiles to $HOME"
   rsync --exclude ".git/" \
         --exclude ".DS_Store" \
         --exclude "install.sh" \
@@ -80,33 +92,55 @@ install_dotfiles() {
         --exclude "scripts/" \
         --exclude "README.md" \
         --exclude "LICENSE-MIT.txt" \
-        --exclude "Brewfile" \
         -avh --no-perms "$DOTFILES_DIR/" "$HOME/"
-  success "Dotfiles synced to $HOME"
+
+  if [[ ! -f "$HOME/.shellrc-custom" ]]; then
+    cat > "$HOME/.shellrc-custom" <<'EOF'
+# Machine-local shell config — never committed to git.
+# Add aliases, env vars, or overrides specific to this machine here.
+# This file is sourced at the end of ~/.shellrc so anything here takes precedence.
+#
+# Examples:
+#   export SOME_SECRET="..."
+#   alias work="cd ~/Work/my-company"
+EOF
+  fi
+  success ".shellrc-custom — edit it with: vim ~/.shellrc-custom"
+
+  if [[ ! -f "$HOME/.vim/autoload/plug.vim" ]]; then
+    curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
+      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  fi
+  vim +PlugInstall +qall
+
+  success "Dotfiles synced and vim plugins installed"
 }
 
 # ── Menu ──────────────────────────────────────────────────────────────────────
 show_menu() {
   echo ""
-  echo "╔═══════════════════════════════════════════════════════╗"
-  echo "║         dotfiles installer — choose a section         ║"
-  echo "╠═══════════════════════════════════════════════════════╣"
-  echo "║  1) Homebrew                                          ║"
-  echo "║  2) CLI tools  (autojump · fzf · lazygit · gh · hub · nvm) ║"
-  echo "║  3) ZSH plugins (autosuggestions · syntax · p10k)     ║"
-  echo "║  4) Dotfiles   (rsync to ~/)                          ║"
-  echo "║  a) All of the above                                  ║"
-  echo "║  q) Quit                                              ║"
-  echo "╚═══════════════════════════════════════════════════════╝"
+  echo "╔══════════════════════════════════════════════════════════════╗"
+  echo "║           dotfiles installer — choose a section             ║"
+  echo "╠══════════════════════════════════════════════════════════════╣"
+  echo "║  1) Homebrew                                                 ║"
+  echo "║  2) CLI brews  (autojump · fzf · lazygit · gh · hub · nvm   ║"
+  echo "║                 vim · kubectl)                               ║"
+  echo "║  3) GUI apps   (iterm2 · kdiff3 · docker)                   ║"
+  echo "║  4) ZSH plugins (autosuggestions · syntax · p10k)           ║"
+  echo "║  5) Dotfiles   (rsync to ~/ + vim-plug install)             ║"
+  echo "║  a) All of the above                                        ║"
+  echo "║  q) Quit                                                    ║"
+  echo "╚══════════════════════════════════════════════════════════════╝"
   echo ""
 }
 
 run_section() {
   case "$1" in
     1) install_brew ;;
-    2) install_cli_tools ;;
-    3) install_zsh_plugins ;;
-    4) install_dotfiles ;;
+    2) install_brews ;;
+    3) install_casks ;;
+    4) install_zsh_plugins ;;
+    5) install_dotfiles ;;
     *) warn "Unknown section: $1" ;;
   esac
 }
@@ -119,7 +153,11 @@ main() {
 
   # Non-interactive: --force / -f runs everything
   if [[ "$1" == "--force" || "$1" == "-f" ]]; then
-    install_brew; install_cli_tools; install_zsh_plugins; install_dotfiles
+    (set -e; install_brew)        || warn "Homebrew failed"
+    (set -e; install_brews)       || warn "CLI brews failed"
+    (set -e; install_casks)       || warn "Casks failed"
+    (set -e; install_zsh_plugins) || warn "ZSH plugins failed"
+    (set -e; install_dotfiles)    || warn "Dotfiles failed"
     return
   fi
 
@@ -127,15 +165,16 @@ main() {
     show_menu
     read -rp "Enter choice: " choice
     case "$choice" in
-      1|2|3|4) (set -e; run_section "$choice") || warn "Section $choice failed — continuing" ;;
+      1|2|3|4|5) (set -e; run_section "$choice") || warn "Section $choice failed — continuing" ;;
       a|A)
         (set -e; install_brew)        || warn "Homebrew failed"
-        (set -e; install_cli_tools)   || warn "CLI tools failed"
+        (set -e; install_brews)       || warn "CLI brews failed"
+        (set -e; install_casks)       || warn "Casks failed"
         (set -e; install_zsh_plugins) || warn "ZSH plugins failed"
         (set -e; install_dotfiles)    || warn "Dotfiles failed"
         break ;;
       q|Q) echo "Bye."; break ;;
-      *) echo "Unknown option — try 1–4, a, or q." ;;
+      *) echo "Unknown option — try 1–5, a, or q." ;;
     esac
   done
 }

@@ -4,7 +4,7 @@
 	name = Alon Yehezkel
 	email = alonn24@gmail.com
 [core]
-	excludesfile = /Users/alony/.gitignore_global
+	excludesfile = ~/.gitignore_global
 [merge]
 	tool = kdiff3
 [mergetool "kdiff3"]

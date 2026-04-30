@@ -1,0 +1,37 @@
+# Shared shell config sourced by both .zshrc and .bashrc.
+# Keep this file POSIX-compatible (no zsh-only or bash-only syntax) and side-effect free.
+
+# ── Env vars ──────────────────────────────────────────────────────────────────
+export NVM_DIR="$HOME/.nvm"
+export NODE_ENV=development
+export PATH="$HOME/.local/bin:$PATH"
+export FZF_DEFAULT_COMMAND='
+  (git ls-tree -r --name-only HEAD ||
+   find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+      sed s/^..//) 2> /dev/null'
+
+# NPM token from ~/.npmrc, if present
+export NPM_TOKEN=$(cat ~/.npmrc 2>/dev/null | grep -o '[a-zA-Z0-9\-]*$')
+
+# ── nvm (works in both bash & zsh) ────────────────────────────────────────────
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh" >/dev/null 2>&1
+
+# ── fzf (per-shell file picked at runtime) ────────────────────────────────────
+if [ -n "$ZSH_VERSION" ]; then
+  [ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
+elif [ -n "$BASH_VERSION" ]; then
+  [ -f ~/.fzf.bash ] && . ~/.fzf.bash
+fi
+
+# ── Aliases ───────────────────────────────────────────────────────────────────
+alias dco="docker-compose"
+alias k="kubectl"
+alias npmToken="cat ~/.npmrc | egrep -o '[a-zA-Z0-9\-]*$'"
+alias sqh="g rebase -i HEAD~2"
+alias pr="hub pull-request -a alonn24 --no-edit -m"
+alias whoUsePort="lsof -i -P -n | grep"
+
+# ── Machine-local overrides ───────────────────────────────────────────────────
+# ~/.shellrc-custom is never committed. Add machine-specific aliases, env vars,
+# or overrides there. Edit it with: vim ~/.shellrc-custom
+[ -f ~/.shellrc-custom ] && . ~/.shellrc-custom

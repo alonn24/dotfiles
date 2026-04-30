@@ -6,6 +6,13 @@ set cursorline
 hi cursorline cterm=none term=none
 highlight CursorLine guibg=#303000 ctermbg=234
 
+" ── Plugins (vim-plug) ────────────────────────────────────────────────────────
+call plug#begin('~/.vim/plugged')
+Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+call plug#end()
+
 " Auto detect filetype
 autocmd BufRead,BufNewFile *.md,*.markdown set filetype=markdown
 autocmd BufRead,BufNewFile *.lytex set filetype=tex

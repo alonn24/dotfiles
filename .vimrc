@@ -2,6 +2,7 @@ set tabstop=2 shiftwidth=2 expandtab autoindent smarttab
 set number
 set ruler
 set visualbell
+set mouse=a
 set cursorline
 hi cursorline cterm=none term=none
 highlight CursorLine guibg=#303000 ctermbg=234
